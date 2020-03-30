@@ -128,5 +128,5 @@ dmypy.json
 # Pyre type checker
 .pyre/
 
-# # Config file login
-# login_config.json
+# Config file login
+login_config.json
