@@ -15,6 +15,7 @@ import re
 from time import sleep
 from calendar import monthrange
 from math import isnan
+import json
 
 def raise_in_ternary(error):
     raise error
@@ -89,7 +90,7 @@ def acess_list_of_days(web_driver_browsed):
     WebDriverWait(web_driver_browsed, 1000).until(EC.presence_of_element_located((By.CSS_SELECTOR, '.XmlGridTable')))
     return web_driver_browsed.find_elements_by_css_selector('.XmlGridTable tbody tr:not(.XmlGridTitleRow) td a')
 
-def login_vpn(web_driver_browsed, email="joao.leal@venhapranuvem.com.br", password="joao2905"):
+def login_vpn(web_driver_browsed, email, password):
     WebDriverWait(web_driver_browsed, 1000).until(EC.element_to_be_clickable((By.CSS_SELECTOR, 'input[value=Avançar]')))
     web_driver_browsed.find_element_by_css_selector('input[name=loginfmt]').send_keys(email)
     web_driver_browsed.find_element_by_css_selector('input[value=Avançar]').click()
@@ -187,6 +188,18 @@ def send_data_to_VPN(web_driver_browsed):
     webdriver.ActionChains(web_driver_browsed).pause(2).key_down(Keys.CONTROL).key_down(Keys.LEFT_SHIFT).send_keys('S').perform()
     webdriver.ActionChains(web_driver_browsed).pause(3).send_keys(Keys.ENTER).pause(3).perform()
 
+def get_config_json():
+    arq = None
+    try:
+        arq = open('login_config.json', 'r')
+        config_json = json.load(arq)
+        return (config_json['email'], config_json['password'])
+    except:
+        print('Erro ao obter arquivo de login!')
+    finally:
+        if not arq is None:
+            arq.close()
+
 def main():
     excel_folha_de_pontos = None
     try:
@@ -198,7 +211,8 @@ def main():
             selenium_wd = get_selenium()
             selenium_wd.maximize_window()
             browser_to_vpn_site(selenium_wd)
-            login_vpn(selenium_wd)
+            email, password = get_config_json()
+            login_vpn(selenium_wd, email, password)
 
             list_of_elements = acess_list_of_days(selenium_wd)
             list_of_days = get_element_indicating_if_filled(list_of_elements)
